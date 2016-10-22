@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ViewController: UIViewController , UITableViewDataSource {
+class ViewController: UIViewController , UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet var tableView: UITableView!
     
@@ -58,9 +58,9 @@ class ViewController: UIViewController , UITableViewDataSource {
                                        style: .default,
                                        handler: { (action:UIAlertAction) -> Void in
                                         
-                                        let textField = alert.textFields!.first
-                                        self.saveName(name: textField!.text ?? "" )
-                                        self.tableView.reloadData()
+                                            let textField = alert.textFields!.first
+                                            self.saveName(name: textField!.text ?? "" )
+                                            self.tableView.reloadData()
         })
         
         let cancelAction = UIAlertAction(title: "Cancelar", style: .default) { (action: UIAlertAction) -> Void in }
@@ -74,7 +74,7 @@ class ViewController: UIViewController , UITableViewDataSource {
         present( alert, animated: true, completion: nil)
     }
     
-    //MARK: UITableViewDelegate
+    //MARK: UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return people.count
     }
@@ -87,29 +87,72 @@ class ViewController: UIViewController , UITableViewDataSource {
         return cell!
     }
     
-    //MARK: CRUD 
+    //MARK: UITableViewDelegate
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        let alert = UIAlertController( title: "¿Modificamos o Eliminamos?",
+                                       message: "Escribe el nuevo nombre para modificarlos",
+                                       preferredStyle: .alert)
+        
+        alert.addTextField { (textFiled) in }
+        
+        let updateAction = UIAlertAction(title: "Modificar", style: .default) { (alertAction) in
+            let newName = alert.textFields!.first!.text!
+            self.updateName( newName: newName )
+        }
+
+        let deleteAction = UIAlertAction(title: "Borarr", style: .destructive) { (alertAction) in
+            self.deleteName()
+        }
+        
+        alert.addAction(updateAction)
+        alert.addAction(deleteAction)
+        
+        present(alert, animated: true, completion: nil)
+    }
+    
+    
+    //MARK: Guardar Nombre en CoreData
     func saveName(name: String) {
-        //1
+        
+        //1 Obtener clase AppDelete para obtener contexto de persistencia
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         
-        //2
+        //2 Selecciona entidad para trabajar
         let entity =  NSEntityDescription.entity(forEntityName: "Person", in: context)
-        
+ 
+        //3 Crear NSManagedObject en modo inserccion
         let person = NSManagedObject(entity: entity!, insertInto: context)
         
-        
-        //3
+        //4 setear datos a modificar
         person.setValue(name, forKey: "name")
         
-        //4
+        //5 controlar entre do catch operacion de salvar, usar try
         do {
             try context.save()
-            //5
+            
+            //actualizar el array
             people.append(person)
+            
         } catch let error as NSError  {
             print("Could not save \(error), \(error.userInfo)")
         }
+    }
+    
+    
+    func deleteName(){
+        print("Eliminamos")
+        /*
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        let entity =  NSEntityDescription.entity(forEntityName: "Person", in: context)
+        */
+
+    }
+    
+    func updateName(newName: String){
+        print("Modificar nombre \(newName)")
     }
     
 }
