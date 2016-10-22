@@ -16,8 +16,6 @@ class ViewController: UIViewController , UITableViewDataSource {
     //var names = [String]()
     var people = [NSManagedObject]()
     
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         super.viewDidLoad()
@@ -25,6 +23,24 @@ class ViewController: UIViewController , UITableViewDataSource {
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+ 
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest : NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Person")
+        
+        do {
+            let resul = try context.fetch(fetchRequest)
+            people = resul as! [NSManagedObject]
+        }catch let error as NSError {
+            print("Error \(error): \(error.userInfo) ")
+        }
+
+        
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
