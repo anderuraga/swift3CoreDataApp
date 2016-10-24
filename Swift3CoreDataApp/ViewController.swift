@@ -13,7 +13,6 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
 
     @IBOutlet var tableView: UITableView!
     
-    //var names = [String]()
     var people = [NSManagedObject]()
     
     override func viewDidLoad() {
@@ -33,12 +32,10 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         
         do {
             let resul = try context.fetch(fetchRequest)
-            people = resul as! [NSManagedObject]
+            people = resul
         }catch let error as NSError {
-            print("Error \(error): \(error.userInfo) ")
+            NSLog("Error \(error): \(error.userInfo) ")
         }
-
-        
     }
     
     override func didReceiveMemoryWarning() {
@@ -72,20 +69,26 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         alert.addAction(cancelAction)
         
         present( alert, animated: true, completion: nil)
-    }
+        
+    }//end addName IBAction
+    
+    
+    
     
     //MARK: UITableViewDataSource
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return people.count
     }
     
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")
         let person = people[indexPath.row]
-        cell!.textLabel!.text = person.value(forKey: "name") as! String
+        cell!.textLabel!.text = person.value(forKey: "name") as? String
         return cell!
     }
+    
+    //end UITableViewDataSource
+    
     
     //MARK: UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -120,7 +123,8 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         alert.addAction( deleteAction )
         
         present(alert, animated: true, completion: nil)
-    }
+    }//end didSelectRowAt
+    
     
     
     //MARK: Guardar Nombre en CoreData
@@ -147,13 +151,13 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
             people.append(person)
             
         } catch let error as NSError  {
-            print("Could not save \(error), \(error.userInfo)")
+            NSLog("Could not save \(error), \(error.userInfo)")
         }
-    }
+    }//end saveName
     
     
     func deleteName( person : NSManagedObject ){
-        print("Eliminamos")
+        NSLog("Eliminamos persona")
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         
@@ -162,14 +166,13 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         do {
            try context.save()
         } catch let error as NSError  {
-            print("Could not Delete \(error), \(error.userInfo)")
+            NSLog("Could not Delete \(error), \(error.userInfo)")
         }
-
-    }
+    }//end deleteName
+    
     
     func updateName( person : NSManagedObject, oldName : String ){
-        print("Modificar nombre")
-        
+        NSLog("Modifcamos nombre")
       
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
@@ -186,11 +189,10 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
             }
             
         } catch let error as NSError  {
-            print("Could not Delete \(error), \(error.userInfo)")
+            NSLog("Could not Delete \(error), \(error.userInfo)")
         }
 
-       
-    }
+    }//end updateName
     
 }
 
