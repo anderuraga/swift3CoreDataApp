@@ -90,6 +90,8 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     //MARK: UITableViewDelegate
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
+        let person = self.people[indexPath.row]
+        
         let alert = UIAlertController( title: "¿Modificamos o Eliminamos?",
                                        message: "Escribe el nuevo nombre para modificarlos",
                                        preferredStyle: .alert)
@@ -98,15 +100,18 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         
         let updateAction = UIAlertAction(title: "Modificar", style: .default) { (alertAction) in
             let newName = alert.textFields!.first!.text!
-            self.updateName( newName: newName )
+            person.setValue( newName, forKey: "name")
+            self.updateName( person: person )
         }
 
         let deleteAction = UIAlertAction(title: "Borarr", style: .destructive) { (alertAction) in
-            self.deleteName()
+            self.deleteName( person : person )
+            self.people.remove(at: indexPath.row)
+            self.tableView.reloadData();    
         }
         
-        alert.addAction(updateAction)
-        alert.addAction(deleteAction)
+        alert.addAction( updateAction )
+        alert.addAction( deleteAction )
         
         present(alert, animated: true, completion: nil)
     }
@@ -141,18 +146,35 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     }
     
     
-    func deleteName(){
+    func deleteName( person : NSManagedObject ){
         print("Eliminamos")
-        /*
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
-        let entity =  NSEntityDescription.entity(forEntityName: "Person", in: context)
-        */
+        
+        context.delete(person)
+        
+        do {
+           try context.save()
+        } catch let error as NSError  {
+            print("Could not Delete \(error), \(error.userInfo)")
+        }
 
     }
     
-    func updateName(newName: String){
-        print("Modificar nombre \(newName)")
+    func updateName( person : NSManagedObject ){
+        print("Modificar nombre")
+        /*
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        
+        context.updatedObjects([people])
+        
+        do {
+            try context.save()
+        } catch let error as NSError  {
+            print("Could not Delete \(error), \(error.userInfo)")
+        }
+       */
     }
     
 }
