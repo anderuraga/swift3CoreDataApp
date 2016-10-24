@@ -91,6 +91,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         let person = self.people[indexPath.row]
+        let oldName = person.value(forKey: "name")
         
         let alert = UIAlertController( title: "¿Modificamos o Eliminamos?",
                                        message: "Escribe el nuevo nombre para modificarlos",
@@ -101,13 +102,18 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
         let updateAction = UIAlertAction(title: "Modificar", style: .default) { (alertAction) in
             let newName = alert.textFields!.first!.text!
             person.setValue( newName, forKey: "name")
-            self.updateName( person: person )
+            
+            self.updateName( person: person, oldName : oldName as! String  )
+            
+            self.people.remove(at: indexPath.row)
+            self.people.insert(person, at: indexPath.row)
+            self.tableView.reloadData();
         }
 
         let deleteAction = UIAlertAction(title: "Borarr", style: .destructive) { (alertAction) in
             self.deleteName( person : person )
             self.people.remove(at: indexPath.row)
-            self.tableView.reloadData();    
+            self.tableView.reloadData();
         }
         
         alert.addAction( updateAction )
@@ -161,20 +167,29 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
 
     }
     
-    func updateName( person : NSManagedObject ){
+    func updateName( person : NSManagedObject, oldName : String ){
         print("Modificar nombre")
-        /*
+        
+      
         let appDelegate = UIApplication.shared.delegate as! AppDelegate
         let context = appDelegate.persistentContainer.viewContext
         
-        context.updatedObjects([people])
+        let fecthRequest : NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Person")
+        fecthRequest.predicate = NSPredicate(format: "name = %@", oldName )
         
         do {
-            try context.save()
+            let resul = try context.fetch(fecthRequest)
+            if resul.count == 1 {
+                let managedObject = resul[0]
+                managedObject.setValue(person, forKey: "name")
+                try context.save()
+            }
+            
         } catch let error as NSError  {
             print("Could not Delete \(error), \(error.userInfo)")
         }
-       */
+
+       
     }
     
 }
