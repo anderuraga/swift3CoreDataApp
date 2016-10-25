@@ -9,14 +9,14 @@
 import UIKit
 import CoreData
 
+
+
 class ViewController: UIViewController , UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet var tableView: UITableView!
-    
     var people = [NSManagedObject]()
     
     override func viewDidLoad() {
-        super.viewDidLoad()
         super.viewDidLoad()
         title = "Listado Nombres"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
@@ -24,18 +24,7 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
- 
-        let appDelegate = UIApplication.shared.delegate as! AppDelegate
-        let context = appDelegate.persistentContainer.viewContext
-        
-        let fetchRequest : NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Person")
-        
-        do {
-            let resul = try context.fetch(fetchRequest)
-            people = resul
-        }catch let error as NSError {
-            NSLog("Error \(error): \(error.userInfo) ")
-        }
+        getAll()
     }
     
     override func didReceiveMemoryWarning() {
@@ -127,7 +116,24 @@ class ViewController: UIViewController , UITableViewDataSource, UITableViewDeleg
     
     
     
-    //MARK: Guardar Nombre en CoreData
+    //MARK: CRUD CoreData
+    
+    func getAll(){
+        let appDelegate = UIApplication.shared.delegate as! AppDelegate
+        let context = appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest : NSFetchRequest<NSManagedObject> = NSFetchRequest(entityName: "Person")
+        
+        do {
+            let resul = try context.fetch(fetchRequest)
+            people = resul
+        }catch let error as NSError {
+            NSLog("Error \(error): \(error.userInfo) ")
+        }
+    }
+    
+    
+    
     func saveName(name: String) {
         
         //1 Obtener clase AppDelete para obtener contexto de persistencia
